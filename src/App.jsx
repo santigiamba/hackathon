@@ -6,9 +6,11 @@ function App() {
   const [error, setError] = useState(null);
   const [temp, setTemp] = useState(null);
   const [windSpeed, setWindSpeed] = useState(null);
-  const [humidity, setHumidity] = useState(null)
+  const [humidity, setHumidity] = useState(null);
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
+  const [air, setAir] = useState(null);  
+  const [pollutants, setPollutants] = useState(null);  
 
   const geocodingApiKey = "4f4cab38624d4e3aa7106718aeea913f"; 
   const weatherApiKey = "e8560341fa9e461ec8fd8b0a24819e86"; 
@@ -34,16 +36,17 @@ function App() {
         const location = data.results[0].geometry;
         setLat(location.lat);
         setLon(location.lng);
-        conditionals(location.lat, location.lng); 
+        getWeatherData(location.lat, location.lng); 
+        getAirData(location.lat, location.lng);  
       } else {
-        throw new Error('No se encontro la ciudad');
+        throw new Error('No se encontraron resultados para la ciudad ingresada');
       }
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const conditionals = async (latitude, longitude) => {
+  const getWeatherData = async (latitude, longitude) => {
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${weatherApiKey}`
@@ -53,13 +56,28 @@ function App() {
       }
       const data = await response.json();
       setTemp(data.main.temp);
-      setWindSpeed(data.wind.speed); 
+      setWindSpeed(data.wind.speed);
       setHumidity(data.main.humidity);
     } catch (err) {
       setError(err.message);
     }
   };
 
+  const getAirData = async (latitude, longitude) => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/air_pollution?lat=${latitude}&lon=${longitude}&appid=${weatherApiKey}`
+      );
+      if (!response.ok) {
+        throw new Error('No se tiene la de calidad del aire');
+      }
+      const data = await response.json();
+      setAir(data.list[0].main.aqi);  
+      setPollutants(data.list[0].components);  
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
     <div>
@@ -69,7 +87,7 @@ function App() {
         onChange={cityChange}
         placeholder="Ciudad"
       />
-      <button onClick={getCoordinates}>Obtener Clima</button>
+      <button onClick={getCoordinates}>Obtener Clima y Calidad del Aire</button>
 
       {lat !== null && lon !== null && (
         <p>Latitud: {lat}, Longitud: {lon}</p>
@@ -81,7 +99,20 @@ function App() {
         <p>Velocidad del viento: {windSpeed} m/s</p>
       )}
       {humidity !== null && (
-        <p>humedad en el ambiente: {humidity}% </p>
+        <p>Humedad: {humidity}%</p>
+      )}
+      {air !== null && (
+        <p>Índice de Calidad del Aire: {air}</p>
+      )}
+      {pollutants && (
+        <div>
+          <p>PM2.5: {pollutants.pm2_5} </p>
+          <p>PM10: {pollutants.pm10} </p>
+          <p>O3: {pollutants.o3} </p>
+          <p>NO2: {pollutants.no2} </p>
+          <p>SO2: {pollutants.so2} </p>
+          <p>CO: {pollutants.co} </p>
+        </div>
       )}
       {error && <p>Error: {error}</p>}
     </div>
