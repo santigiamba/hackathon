@@ -5,11 +5,12 @@ function App() {
   const [city, setCity] = useState('');
   const [error, setError] = useState(null);
   const [temp, setTemp] = useState(null);
+  const [viento, setViento] = useState(null);
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
   
-  const geocodingApiKey = "4f4cab38624d4e3aa7106718aeea913f";  // Reemplaza con tu clave de API de OpenCage
-  const weatherApiKey = "e8560341fa9e461ec8fd8b0a24819e86"; // Reemplaza con tu clave de API de OpenWeatherMap
+  const geocodingApiKey = "4f4cab38624d4e3aa7106718aeea913f"; 
+  const weatherApiKey = "e8560341fa9e461ec8fd8b0a24819e86"; 
 
   const cityChange = (e) => {
     setCity(e.target.value);
@@ -32,7 +33,7 @@ function App() {
         const location = data.results[0].geometry;
         setLat(location.lat);
         setLon(location.lng);
-        getTemperature(location.lat, location.lng); // Llama a la función para obtener la temperatura
+        getTemperature(location.lat, location.lng); 
       } else {
         throw new Error('No se encontraron resultados para la ciudad ingresada');
       }
