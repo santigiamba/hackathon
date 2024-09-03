@@ -1,0 +1,11 @@
+.conteinerInput{
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+}
+
+body, html {
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center;     /* Centrar verticalmente */
+}
